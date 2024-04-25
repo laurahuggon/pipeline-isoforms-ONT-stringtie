@@ -1,0 +1,14 @@
+name: ont_stringtie
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+ - nanoporetech
+dependencies:
+ - snakemake==8.10.8
+ - python>3.6
+ - nanostat==1.6
+ - nanoporetech::pychopper==2.7.9
+ - minimap2==2.28
+ - samtools==1.20
+ - stringtie==2.2.2
