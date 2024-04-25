@@ -79,7 +79,7 @@ conda deactivate
 ## Output
 ```
 working directory  
-|--- config.yml           # a copy of the parameters used in the pipeline  
+|--- config.yml                                     # a copy of the parameters used in the pipeline  
 |--- Nanostat/  
      |-- # output of nanostat - fastq stats  
 |--- Pychopper/  
@@ -88,7 +88,7 @@ working directory
      |-- # output of minimap2 - aligned reads  
 |--- strintie2/  
      |-- # output of stringtie2  
-     |-- _stringtie.gtf                       # assembled transcripts  
-     |-- _stringtie_abundance.tsv    # transcript abundance  
+     |-- _stringtie.gtf                             # assembled transcripts  
+     |-- _stringtie_abundance.tsv                   # transcript abundance  
      
 ```
