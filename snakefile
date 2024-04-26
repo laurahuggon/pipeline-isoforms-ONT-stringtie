@@ -12,7 +12,7 @@ min_version("7.18")
 # ----------------------------------------------------------------
 
 configfile: "config.yml"
-# validate(config=config, schema="schema/config_schema.yaml")
+validate(config, schema="schema/config_schema.yaml")
 workdir: config["workdir"]
 
 WORKDIR = config["workdir"]
@@ -21,6 +21,21 @@ SNAKEDIR = path.dirname(workflow.snakefile)
 shutil.copy2(SNAKEDIR + "/config.yml", WORKDIR)
 
 sample = config["sample_name"]
+
+
+in_fastq = config["reads_fastq"]
+if not path.isabs(in_fastq):
+    in_fastq = path.join(SNAKEDIR, in_fastq)
+    assert os.path.exists(in_fastq)
+
+in_genome = config["genome"]
+if not path.isabs(in_genome):
+    in_genome = path.join(SNAKEDIR, in_genome)
+    assert os.path.exists(in_genome)
+
+in_annotation = config["annotation"]
+if not path.isabs(in_annotation) and in_annotation != "":
+    in_annotation = path.join(SNAKEDIR, in_annotation)
 
 
 # ----------------------------------------------------------------
@@ -129,131 +144,38 @@ rule aln_stats:
         """
 # ----------------------------------------------------------------
 
-rule talon_initialize_database:
-    input:
-        gtf=config["gtf"]
+use_guide = "NO"
+if config["use_guide_annotation"] is True:
+    use_guide = "YES"
 
-    output:
-        db=path.join("Talon", f"talon_{Path(config['gtf']).stem}.db")
+str_threads = 10
+if config["threads"] < str_threads:
+    str_threads = config["threads"]
 
-    params:
-        gtf_name=Path(config["gtf"]).stem,
-        gbuild="hg38",
-        prefix=path.join("Talon", f"talon_{Path(config['gtf']).stem}")
-
-    log: path.join("Talon", f"{sample}_talon_db.log")
-
-    shell:
-        """
-        (talon_initialize_database --f {input.gtf} --a {params.gtf_name} --g {params.gbuild} --o {params.prefix}) &> {log}
-        """
-
-# ----------------------------------------------------------------
-
-rule talon_label_reads:
+rule run_stringtie:
     input:
         sam=rules.minimap_mapping.output.sam,
         fa=config["genome"]
 
     output:
-        sam=path.join("Talon", f"{sample}_labeled.sam")
+        gff = path.join("StringTie", f"{sample}_stringtie.gff"),
+        abundance = path.join("StringTie", f"{sample}_stringtie.abundance.tsv")
 
     params:
-        prefix=path.join("Talon", sample)
-
-    log: path.join("Talon", f"{sample}_talon_labelReads.log")
-
+        opts = config["stringtie_opts"],
+        guide = use_guide,
+        ann = in_annotation
+    
+    log: "StringTie/{sample}_StringTie.log"
+    
     threads: config["threads"]
 
-    shell:
+    conda: "workflow/envs/stringtie.yml"
+
+    script:
         """
-        (talon_label_reads --f {input.sam} --g {input.fa} --t {threads} --deleteTmp --o {params.prefix}) &> {log}
-        """
-# ----------------------------------------------------------------
-
-rule talon_annotate:
-    input:
-        sam=rules.talon_label_reads.output.sam,
-        talon_db=rules.talon_initialize_database.output.db
-
-    output:
-        qc=path.join("Talon", f"{sample}_QC.log"),
-        tsv=path.join("Talon", f"{sample}_talon_read_annot.tsv")
-
-    params:
-        prefix1=sample,
-        prefix2=path.join("Talon", sample),
-        description=f"{sample}_sam",
-        gbuild="hg38"
-
-    log: path.join("Talon", f"{sample}_talon_annotate.log")
-
-    threads: config["threads"]
-
-    shell:
-        """
-        echo '{params.prefix1},{params.description},ONT,{input.sam}' > Talon/config_file.txt &&
-        (talon --f Talon/config_file.txt --db {input.talon_db} --build {params.gbuild} --threads {threads} --o {params.prefix2}) &> {log}
-        """
-# ----------------------------------------------------------------
-
-rule talon_filter_transcripts:
-    input:
-        talon_db=rules.talon_initialize_database.output.db,
-        job_hold=rules.talon_annotate.output.tsv
-
-    output:
-        csv=path.join("Talon", f"{sample}_whitelist.csv")
-
-    params:
-        gtf_name=Path(config["gtf"]).stem,
-        min_count=config["MIN_COUNT"]
-
-    log: path.join("Talon", f"{sample}_talon_filter.log")
-
-    shell:
-        """
-        (talon_filter_transcripts --db {input.talon_db} -a {params.gtf_name} --maxFracA 0.5 --minCount {params.min_count} --o {output.csv}) &> {log}
-        """
-# ----------------------------------------------------------------
-
-rule talon_abundance:
-    input:
-        talon_db=rules.talon_initialize_database.output.db,
-        whitelist=rules.talon_filter_transcripts.output.csv
-
-    output:
-        tsv=path.join("Talon", f"{sample}_talon_abundance_filtered.tsv")
-
-    params:
-        gtf_name=Path(config["gtf"]).stem,
-        gbuild="hg38",
-        prefix=path.join("Talon", sample)
-
-    log: path.join("Talon", f"{sample}_talon_abundance.log")
-
-    shell:
-        """
-        (talon_abundance --db {input.talon_db} -a {params.gtf_name} --build {params.gbuild} --whitelist {input.whitelist} --o {params.prefix}) &> {log}
-        """
-# ----------------------------------------------------------------
-
-rule talon_create_GTF:
-    input:
-        talon_db=rules.talon_initialize_database.output.db,
-        whitelist=rules.talon_filter_transcripts.output.csv
-
-    output:
-        talon_gtf=path.join("Talon", f"{sample}_talon.gtf")
-
-    params:
-        gtf_name=Path(config["gtf"]).stem,
-        gbuild="hg38",
-        prefix=path.join("Talon", sample)
-
-    log: path.join("Talon", f"{sample}_talon_gtf.log")
-
-    shell:
-        """
-        (talon_create_GTF --db {input.talon_db} -a {params.gtf_name} --build {params.gbuild} --whitelist {input.whitelist} --o {params.prefix}) &> {log}
+        G_FLAG=""
+        if params.guide == "YES":
+            G_FLAG="-G {params.ann}"
+        stringtie --rf $G_FLAG -l -L -v -p {threads} {params.opts} -o {output.gff} -A {output.abundance} {input.sam} 2> {log}
         """

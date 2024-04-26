@@ -2,19 +2,16 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: "/home/MinaRyten/Emil/projects/MANE_select_expression/"
+workdir: ""
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "Temporal_lobe"
+sample_name: ""
 
-# reference genome as fasta (required)
-genome: "/home/JHEmilGustavsson/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
+# reference genome as fasta (required):
+genome: ""
 
-# ONT reads in fastq format
-reads_fastq: "/home/MinaRyten/Emil/Human_brain_direct_cDNA/Temporal_lobe_PAG09924/Temporal_lobe_PAG09924_pass.fastq"
-
-# Calculate various statistics with nanostat:
-run_nanostat: True
+# ONT reads in fastq format (required):
+reads_fastq: ""
 
 # Process cDNA reads using pychopper, turn off for direct RNA:
 run_pychopper: True
@@ -31,10 +28,11 @@ minimap2_opts: "-uf -k14 --MD"
 # threads (default = 30)
 threads: 100
 
-# input annotation data required for sqanti (required)
-# make sure the contig names in the annotation matches the input SAM file
-gtf: "/home/JHEmilGustavsson/MinaRyten/Emil/references/gencode.v44.annotation.gtf"
+# Use exiting annotation as guide for stringtie2:
+use_guide_annotation: true
 
-## ------------------------------ TALON ------------------------------ ##
-# Number of reads required to call a novel transcript PER dataset:
-MIN_COUNT: 2
+# reference annotation as GTF (required if use_guide_annotation = true):
+annotation: ""
+
+# Options passed to stringtie2:
+stringtie2_opts: ""

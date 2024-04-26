@@ -10,18 +10,13 @@
 
 This is a `snakemake` pipeline that takes Oxford Nanopore Sequencing (ONT) data (fastq) as input, generates fastq stats using `nanostat`, performs fastq processing and filtering using `pychopper`, map the reads to the genome using `minimap2` and uses `stringtie2` to assemble and quantify transcripts. Below is the dag of the pipeline:  
 
-<p align="center">
-  <img src="dag/dag.png" width="600" height="800"/>  
-</p>
-
-
 # Getting Started
 
 ## Input
 
 - ONT fastq reads
 - Reference genome assembly in fasta format
-- GTF: [Gencode GTF](https://www.gencodegenes.org/human/); tested on v38 comprehensive CHR gene annotation
+- referecne annotation as GTF: [Gencode GTF](https://www.gencodegenes.org/human/); tested on v38 comprehensive CHR gene annotation
 
 ## Depedencies
 
@@ -84,8 +79,10 @@ working directory
      |-- # output of nanostat - fastq stats  
 |--- Pychopper/  
      |-- # output of pychopper - filtered fastq  
-|--- Mapping/  
+|--- minimap2/  
      |-- # output of minimap2 - aligned reads  
+|--- samtools
+     |--- # output of alignment stats - TSV
 |--- strintie2/  
      |-- # output of stringtie2  
      |-- _stringtie.gtf                             # assembled transcripts  
