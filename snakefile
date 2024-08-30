@@ -42,12 +42,9 @@ if not path.isabs(in_annotation) and in_annotation != "":
 
 target_list = [
     "Nanostat/stat_out.txt",
-    path.join("stringtie", f"{sample}_stringtie_abundance.tsv"),
-    path.join("stringtie", f"{sample}_stringtie.gtf")
+    path.join("StringTie", f"{sample}_stringtie.gff")
 ]
 
-if config.get("reads_fastq") == "":
-    target_list.remove("Nanostat/stat_out.txt")
 
 rule all:
     input:
@@ -144,10 +141,6 @@ rule aln_stats:
         """
 # ----------------------------------------------------------------
 
-use_guide = "NO"
-if config["use_guide_annotation"] is True:
-    use_guide = "YES"
-
 str_threads = 10
 if config["threads"] < str_threads:
     str_threads = config["threads"]
@@ -158,24 +151,22 @@ rule run_stringtie:
         fa=config["genome"]
 
     output:
-        gff = path.join("StringTie", f"{sample}_stringtie.gff"),
-        abundance = path.join("StringTie", f"{sample}_stringtie.abundance.tsv")
+        gff = path.join("StringTie", f"{sample}_stringtie.gff")
 
     params:
         opts = config["stringtie_opts"],
-        guide = use_guide,
-        ann = in_annotation
-    
-    log: "StringTie/{sample}_StringTie.log"
+        ann = in_annotation if config["use_guide_annotation"] else ""
+
+    log: path.join("StringTie", f"{sample}_StringTie.log")
     
     threads: config["threads"]
 
-    conda: "workflow/envs/stringtie.yml"
+    run:
+        g_flag = f"-G {params.ann}" if params.ann else ""
+        shell(
+            f"""
+            stringtie --rf {g_flag} -L -v -p {threads} {params.opts} -o {output.gff} {input.sam} 2> {log}
+            """
+        )
 
-    script:
-        """
-        G_FLAG=""
-        if params.guide == "YES":
-            G_FLAG="-G {params.ann}"
-        stringtie --rf $G_FLAG -l -L -v -p {threads} {params.opts} -o {output.gff} -A {output.abundance} {input.sam} 2> {log}
-        """
+

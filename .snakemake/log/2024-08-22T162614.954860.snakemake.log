@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in rule all  in line 50 of /home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/snakefile:
+Missing input files for rule all:
+    affected files:
+        StringTie/sample_579_stringtie_abundance.tsv

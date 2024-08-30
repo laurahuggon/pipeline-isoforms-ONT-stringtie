@@ -1,0 +1,6 @@
+Building DAG of jobs...
+MissingInputException in rule nanostat  in line 55 of /home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/snakefile:
+Missing input files for rule nanostat:
+    output: Nanostat/stat_out.txt
+    affected files:
+        /home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5295_PAM77944.fastq

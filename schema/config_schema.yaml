@@ -18,18 +18,13 @@ properties:
 
   reads_fastq:
     type: string
-    default: ""
-
-  gtf:
-    type: string
     minLength: 1
 
   threads:
     type: integer
     default: 30
 
-
 required:
   - workdir
   - genome
-  - gtf
+  - reads_fastq

@@ -1,0 +1,39 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 150
+Rules claiming more threads will be scaled down.
+Job stats:
+job              count    min threads    max threads
+-------------  -------  -------------  -------------
+all                  1              1              1
+run_stringtie        1            150            150
+total                2              1            150
+
+Select jobs to execute...
+
+[Fri Aug 23 11:30:26 2024]
+rule run_stringtie:
+    input: Mapping/sample_579_minimap.sam, /home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa
+    output: StringTie/sample_579_stringtie.gff
+    log: StringTie/sample_579_StringTie.log
+    jobid: 2
+    reason: Missing output files: StringTie/sample_579_stringtie.gff
+    threads: 150
+    resources: tmpdir=/tmp
+
+[Fri Aug 23 11:34:38 2024]
+Finished job 2.
+1 of 2 steps (50%) done
+Select jobs to execute...
+
+[Fri Aug 23 11:34:38 2024]
+localrule all:
+    input: Nanostat/stat_out.txt, StringTie/sample_579_stringtie.gff
+    jobid: 0
+    reason: Input files updated by another job: StringTie/sample_579_stringtie.gff
+    resources: tmpdir=/tmp
+
+[Fri Aug 23 11:34:38 2024]
+Finished job 0.
+2 of 2 steps (100%) done
+Complete log: ../../../Snakemakes/pipeline-isoforms-ONT-stringtie/.snakemake/log/2024-08-23T113026.585487.snakemake.log

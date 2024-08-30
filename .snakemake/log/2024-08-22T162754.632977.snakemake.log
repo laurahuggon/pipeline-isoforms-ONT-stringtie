@@ -1,0 +1,4 @@
+Building DAG of jobs...
+WorkflowError:
+Failed to open source file /home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/workflow/envs/stringtie.yml
+FileNotFoundError: [Errno 2] No such file or directory: '/home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/workflow/envs/stringtie.yml'
