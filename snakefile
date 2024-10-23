@@ -52,6 +52,25 @@ rule all:
 
 # ----------------------------------------------------------------
 
+# Conditionally run the concatenate_reads rule based on the config
+if config.get("concatenate_reads", False):
+
+    rule concatenate_reads:
+        input:
+            fq = in_fastq
+
+        output:
+            fq_concat = temp(path.join("processed_reads", f"{sample}_reads.fq"))
+
+        threads: config["threads"]
+
+        shell:
+            """
+            find {input.fq}  -regextype posix-extended -regex '.*\.(fastq.gz|fq.gz)$' -exec zcat {{}} \\; > {output.fq_concat}
+            """
+
+# ----------------------------------------------------------------
+
 rule nanostat:
     input:
         fq=config["reads_fastq"]
@@ -65,7 +84,6 @@ rule nanostat:
         """
         NanoStat -n {output.ns} -t {threads} --tsv --fastq {input.fq}
         """
-
 
 # ----------------------------------------------------------------
 

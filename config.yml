@@ -13,6 +13,9 @@ genome: "/home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
 # ONT reads in fastq format (required):
 reads_fastq: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5292_PAG75292.fastq"
 
+# The path above is a directory, find and concatenate fastq files:
+concatenate_reads: True
+
 # Process cDNA reads using pychopper, turn off for direct RNA:
 run_pychopper: True
 
