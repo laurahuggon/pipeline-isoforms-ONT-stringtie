@@ -19,6 +19,10 @@ properties:
   reads_fastq:
     type: string
     minLength: 1
+  
+  concatenate_reads:
+    type: boolean
+    default: false
 
   threads:
     type: integer

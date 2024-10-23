@@ -73,7 +73,7 @@ if config.get("concatenate_reads", False):
 
 rule nanostat:
     input:
-        fq=config["reads_fastq"]
+        fq=rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else config["reads_fastq"]
 
     output:
         ns="Nanostat/stat_out.txt"
@@ -89,17 +89,18 @@ rule nanostat:
 
 rule pychopper:
     input:
-        fq=config["reads_fastq"]
+        # Use concatenated FASTQ if concatenate_reads is True, otherwise use the original FASTQ
+        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else config["reads_fastq"]
 
     output:
-        pyfq=path.join("Pychopper", f"{sample}_full_length_reads.fastq")
+        pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fastq")
 
     params:
-        outpath="Pychopper",
-        prefix=f"{sample}_full_length_reads.fastq",
-        pc="True" if config["run_pychopper"] else "False",
-        pc_opts=config["pychopper_opts"],
-        kit=config["kit"]
+        outpath = "Pychopper",
+        prefix = f"{sample}_full_length_reads.fastq",
+        pc = "True" if config["run_pychopper"] else "False",
+        pc_opts = config["pychopper_opts"],
+        kit = config["kit"]
 
     log: path.join(WORKDIR, "Pychopper", f"{sample}_pychopped.log")
 
