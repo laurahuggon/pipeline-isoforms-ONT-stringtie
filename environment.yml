@@ -3,12 +3,11 @@ channels:
  - conda-forge
  - bioconda
  - defaults
- - nanoporetech
 dependencies:
  - snakemake==7.18.2
  - python>3.6
  - nanostat==1.6
- - nanoporetech::pychopper==2.7.6
- - minimap2==2.26
+ - bioconda::pychopper=2.7.10
+ - minimap2==2.28
  - samtools==1.18
- - stringtie==2.2.1
+ - stringtie==2.2.3
