@@ -2,7 +2,6 @@ import os
 import Bio
 import shutil
 from os import path
-from re import search
 from pathlib import Path
 
 from snakemake.utils import validate
@@ -22,7 +21,6 @@ shutil.copy2(SNAKEDIR + "/config.yml", WORKDIR)
 
 sample = config["sample_name"]
 
-
 in_fastq = config["reads_fastq"]
 
 # Make sure the path is absolute
@@ -36,7 +34,6 @@ if os.path.isdir(in_fastq):
 else:
     in_fastq = [in_fastq]  # Wrap the single file into a list
 
-
 in_genome = config["genome"]
 if not path.isabs(in_genome):
     in_genome = path.join(SNAKEDIR, in_genome)
@@ -46,14 +43,12 @@ in_annotation = config["annotation"]
 if not path.isabs(in_annotation) and in_annotation != "":
     in_annotation = path.join(SNAKEDIR, in_annotation)
 
-
 # ----------------------------------------------------------------
 
 target_list = [
     "Nanostat/stat_out.txt",
     path.join("StringTie", f"{sample}_stringtie.gff")
 ]
-
 
 rule all:
     input:
@@ -72,44 +67,22 @@ if config.get("concatenate_reads", False):
 
         threads: config["threads"]
 
-        shell:
-            """
-            if echo {input.fq} | grep -E '.*\.(fastq.gz|fq.gz)$'; then
-                find {input.fq} -regextype posix-extended -regex '.*\.(fastq.gz|fq.gz)$' | \
-                xargs -P {threads} -I{{}} zcat {{}} | gzip > {output.fq_concat};
-            else
-                find {input.fq} -regextype posix-extended -regex '.*\.(fastq|fq)$' | \
-                xargs -P {threads} -I{{}} cat {{}} | gzip > {output.fq_concat};
-            fi
-            """
+        run:
+            import gzip
+            
+            # Create an output gzip file
+            with gzip.open(output.fq_concat, 'wt') as fout:
+                for fastq_file in input.fq:
+                    with gzip.open(fastq_file, 'rt') if fastq_file.endswith('.gz') else open(fastq_file, 'r') as fin:
+                        for line in fin:
+                            fout.write(line)
 
 # ----------------------------------------------------------------
 
-# Rule to unzip FASTQ (only if the files are gzipped)
-rule unzip_fastq:
-    input:
-        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
-
-    output:
-        fq_unzipped = temp(path.join("processed_reads", f"{sample}_reads_unzipped.fq"))
-
-    threads: config["threads"]
-
-    shell:
-        """
-        if echo {input.fq} | grep -E '.*\.(fastq.gz|fq.gz)$'; then
-            zcat {input.fq} > {output.fq_unzipped};
-        else
-            ln -s `realpath {input.fq}` {output.fq_unzipped};
-        fi
-        """
-
-# ----------------------------------------------------------------
-
-# Rule for NanoStat, using unzipped FASTQ files
+# Rule for NanoStat, using concatenated FASTQ files
 rule nanostat:
     input:
-        fq = rules.unzip_fastq.output.fq_unzipped
+        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
 
     output:
         ns = "Nanostat/stat_out.txt"
@@ -125,7 +98,7 @@ rule nanostat:
 
 rule pychopper:
     input:
-        fq = rules.unzip_fastq.output.fq_unzipped
+        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
 
     output:
         pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fastq")
@@ -194,6 +167,7 @@ rule aln_stats:
         """
         samtools stats -@ {threads} {input.sam} > {output.tsv}
         """
+
 # ----------------------------------------------------------------
 
 str_threads = 10
@@ -223,5 +197,3 @@ rule run_stringtie:
             stringtie --rf {g_flag} -L -v -p {threads} {params.opts} -o {output.gff} {input.sam} 2> {log}
             """
         )
-
-

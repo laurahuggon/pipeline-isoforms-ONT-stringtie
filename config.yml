@@ -2,16 +2,16 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: "/home/MinaRyten/Emil/projects/APP_manuscript/ONT_long_read_analysis/sample_5292"
+workdir: "/home/JHEmilGustavsson/MinaRyten/Emil/iPSC_oligo/sample_1_001"
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "sample_5292"
+sample_name: "sample_1_001"
 
 # reference genome as fasta (required):
 genome: "/home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
 
 # ONT reads in fastq format (required):
-reads_fastq: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5292_PAG75292.fastq"
+reads_fastq: "/home/JHEmilGustavsson/MinaRyten/Emil/iPSC_oligo/FASTQ_pass/1_001/"
 
 # The path above is a directory, find and concatenate fastq files:
 concatenate_reads: True
@@ -32,7 +32,7 @@ minimap2_opts: "-uf -k14 --MD"
 threads: 150
 
 # Use exiting annotation as guide for stringtie2:
-use_guide_annotation: false
+use_guide_annotation: True
 
 # reference annotation as GTF (required if use_guide_annotation = true):
 annotation: "/home/MinaRyten/Emil/references/gencode.v44.annotation.gtf"
