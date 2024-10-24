@@ -35,7 +35,7 @@ threads: 150
 use_guide_annotation: false
 
 # reference annotation as GTF (required if use_guide_annotation = true):
-annotation: "/home/MinaRyten/Emil/references/gencode.v38.annotation.gtf"
+annotation: "/home/MinaRyten/Emil/references/gencode.v44.annotation.gtf"
 
 # Options passed to stringtie2:
 stringtie_opts: ""

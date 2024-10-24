@@ -24,9 +24,18 @@ sample = config["sample_name"]
 
 
 in_fastq = config["reads_fastq"]
+
+# Make sure the path is absolute
 if not path.isabs(in_fastq):
     in_fastq = path.join(SNAKEDIR, in_fastq)
     assert os.path.exists(in_fastq)
+
+# If it is a directory, gather all FASTQ files inside, otherwise treat it as a file
+if os.path.isdir(in_fastq):
+    in_fastq = [str(f) for f in Path(in_fastq).rglob('*') if f.suffix in ['.fastq', '.fq', '.gz']]
+else:
+    in_fastq = [in_fastq]  # Wrap the single file into a list
+
 
 in_genome = config["genome"]
 if not path.isabs(in_genome):
@@ -52,15 +61,14 @@ rule all:
 
 # ----------------------------------------------------------------
 
-# Conditionally run the concatenate_reads rule based on the config
+# Rule to concatenate reads if config['concatenate_reads'] is True
 if config.get("concatenate_reads", False):
-
     rule concatenate_reads:
         input:
             fq = in_fastq
 
         output:
-            fq_concat = temp(path.join("processed_reads", f"{sample}_reads.fq"))
+            fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq.gz"))
 
         threads: config["threads"]
 
@@ -68,21 +76,43 @@ if config.get("concatenate_reads", False):
             """
             if echo {input.fq} | grep -E '.*\.(fastq.gz|fq.gz)$'; then
                 find {input.fq} -regextype posix-extended -regex '.*\.(fastq.gz|fq.gz)$' | \
-                xargs -P {threads} -I{{}} zcat {{}} > {output.fq_concat};
+                xargs -P {threads} -I{{}} zcat {{}} | gzip > {output.fq_concat};
             else
                 find {input.fq} -regextype posix-extended -regex '.*\.(fastq|fq)$' | \
-                xargs -P {threads} -I{{}} cat {{}} > {output.fq_concat};
+                xargs -P {threads} -I{{}} cat {{}} | gzip > {output.fq_concat};
             fi
             """
 
 # ----------------------------------------------------------------
 
-rule nanostat:
+# Rule to unzip FASTQ (only if the files are gzipped)
+rule unzip_fastq:
     input:
-        fq=rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else config["reads_fastq"]
+        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
 
     output:
-        ns="Nanostat/stat_out.txt"
+        fq_unzipped = temp(path.join("processed_reads", f"{sample}_reads_unzipped.fq"))
+
+    threads: config["threads"]
+
+    shell:
+        """
+        if echo {input.fq} | grep -E '.*\.(fastq.gz|fq.gz)$'; then
+            zcat {input.fq} > {output.fq_unzipped};
+        else
+            ln -s `realpath {input.fq}` {output.fq_unzipped};
+        fi
+        """
+
+# ----------------------------------------------------------------
+
+# Rule for NanoStat, using unzipped FASTQ files
+rule nanostat:
+    input:
+        fq = rules.unzip_fastq.output.fq_unzipped
+
+    output:
+        ns = "Nanostat/stat_out.txt"
 
     threads: config["threads"]
 
@@ -95,8 +125,7 @@ rule nanostat:
 
 rule pychopper:
     input:
-        # Use concatenated FASTQ if concatenate_reads is True, otherwise use the original FASTQ
-        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else config["reads_fastq"]
+        fq = rules.unzip_fastq.output.fq_unzipped
 
     output:
         pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fastq")
@@ -131,14 +160,14 @@ rule pychopper:
 
 rule minimap_mapping:
     input:
-        genome=config["genome"],
-        fq=rules.pychopper.output.pyfq
+        genome = config["genome"],
+        fq = rules.pychopper.output.pyfq
 
     output:
-        sam=path.join("Mapping", f"{sample}_minimap.sam")
+        sam = path.join("Mapping", f"{sample}_minimap.sam")
 
     params:
-        opts=config["minimap2_opts"]
+        opts = config["minimap2_opts"]
 
     log: path.join("Mapping", f"{sample}_minimap.log")
 
@@ -149,6 +178,7 @@ rule minimap_mapping:
         minimap2 -ax splice {params.opts} --secondary=no -t {threads} {input.genome} {input.fq} \
         | samtools sort -@ {threads} -o {output.sam}
         """
+
 # ----------------------------------------------------------------
 
 rule aln_stats:
