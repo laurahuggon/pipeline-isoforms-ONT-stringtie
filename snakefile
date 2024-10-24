@@ -67,9 +67,11 @@ if config.get("concatenate_reads", False):
         shell:
             """
             if echo {input.fq} | grep -E '.*\.(fastq.gz|fq.gz)$'; then
-                find {input.fq} -regextype posix-extended -regex '.*\.(fastq.gz|fq.gz)$' -exec zcat {{}} \\; > {output.fq_concat};
+                find {input.fq} -regextype posix-extended -regex '.*\.(fastq.gz|fq.gz)$' | \
+                xargs -P {threads} -I{{}} zcat {{}} > {output.fq_concat};
             else
-                find {input.fq} -regextype posix-extended -regex '.*\.(fastq|fq)$' -exec cat {{}} \\; > {output.fq_concat};
+                find {input.fq} -regextype posix-extended -regex '.*\.(fastq|fq)$' | \
+                xargs -P {threads} -I{{}} cat {{}} > {output.fq_concat};
             fi
             """
 
