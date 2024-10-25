@@ -46,7 +46,7 @@ if not path.isabs(in_annotation) and in_annotation != "":
 # ----------------------------------------------------------------
 
 target_list = [
-    "Nanostat/stat_out.txt",
+    # "Nanostat/stat_out.txt",
     path.join("StringTie", f"{sample}_stringtie.gff")
 ]
 
@@ -57,42 +57,46 @@ rule all:
 # ----------------------------------------------------------------
 
 # Rule to concatenate reads if config['concatenate_reads'] is True
+# Rule to concatenate reads if config['concatenate_reads'] is True
 if config.get("concatenate_reads", False):
     rule concatenate_reads:
         input:
             fq = in_fastq
 
         output:
-            fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq.gz"))
+            fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq"))
+
+        params:
+            concat = "True"
 
         threads: config["threads"]
 
-        run:
-            import gzip
-            
-            # Create an output gzip file
-            with gzip.open(output.fq_concat, 'wt') as fout:
-                for fastq_file in input.fq:
-                    with gzip.open(fastq_file, 'rt') if fastq_file.endswith('.gz') else open(fastq_file, 'r') as fin:
-                        for line in fin:
-                            fout.write(line)
+        shell:
+            """
+            if [[ {params.concat} == "True" ]]; then
+                find {input.fq} -regextype posix-extended -regex '.*\\.(fastq|fq)$' -exec cat {{}} \\; > {output.fq_concat}
+                find {input.fq} -regextype posix-extended -regex '.*\\.gz$' -exec zcat {{}} \\; >> {output.fq_concat}
+            else
+                ln -s `realpath {input.fq}` {output.fq_concat}
+            fi
+            """
 
 # ----------------------------------------------------------------
 
-# Rule for NanoStat, using concatenated FASTQ files
-rule nanostat:
-    input:
-        fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
+# # Rule for NanoStat, using concatenated FASTQ files
+# rule nanostat:
+#     input:
+#         fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
 
-    output:
-        ns = "Nanostat/stat_out.txt"
+#     output:
+#         ns = "Nanostat/stat_out.txt"
 
-    threads: config["threads"]
+#     threads: config["threads"]
 
-    shell:
-        """
-        NanoStat -n {output.ns} -t {threads} --tsv --fastq {input.fq}
-        """
+#     shell:
+#         """
+#         NanoStat -n {output.ns} -t {threads} --tsv --fastq {input.fq}
+#         """
 
 # ----------------------------------------------------------------
 

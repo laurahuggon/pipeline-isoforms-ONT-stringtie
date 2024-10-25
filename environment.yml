@@ -5,7 +5,7 @@ channels:
  - defaults
 dependencies:
  - snakemake==7.18.2
- - python>3.6
+ - python=3.9 
  - nanostat==1.6
  - bioconda::pychopper=2.7.10
  - minimap2==2.28
