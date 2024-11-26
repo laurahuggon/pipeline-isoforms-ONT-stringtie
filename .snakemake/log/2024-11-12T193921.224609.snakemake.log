@@ -1,0 +1,28 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 200
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count    min threads    max threads
+---------------  -------  -------------  -------------
+all                    1              1              1
+minimap_mapping        1            200            200
+pychopper              1            200            200
+run_stringtie          1            200            200
+total                  4              1            200
+
+Select jobs to execute...
+
+[Tue Nov 12 19:39:23 2024]
+rule pychopper:
+    input: processed_reads/sample_11_829_reads_concat.fq
+    output: Pychopper/sample_11_829_full_length_reads.fq
+    log: /home/JHEmilGustavsson/MinaRyten/Emil/iPSC_oligo/sample_11_829/Pychopper/sample_11_829_pychopped.log
+    jobid: 3
+    reason: Missing output files: Pychopper/sample_11_829_full_length_reads.fq
+    threads: 200
+    resources: tmpdir=/tmp
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: ../../Snakemakes/pipeline-isoforms-ONT-stringtie/.snakemake/log/2024-11-12T193921.224609.snakemake.log

@@ -2,16 +2,16 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: "/home/JHEmilGustavsson/MinaRyten/Emil/iPSC_oligo/sample_1_001"
+workdir: ""
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "sample_1_001"
+sample_name: "sample"
 
 # reference genome as fasta (required):
-genome: "/home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
+genome: "/genome.fa"
 
 # ONT reads in fastq format (required):
-reads_fastq: "/home/JHEmilGustavsson/MinaRyten/Emil/iPSC_oligo/FASTQ_pass/1_001/"
+reads_fastq: ""
 
 # The path above is a directory, find and concatenate fastq files:
 concatenate_reads: True
@@ -29,13 +29,13 @@ pychopper_opts: ""
 minimap2_opts: "-uf -k14 --MD"
 
 # threads (default = 30)
-threads: 150
+threads: 200
 
 # Use exiting annotation as guide for stringtie2:
-use_guide_annotation: True
+use_guide_annotation: False
 
 # reference annotation as GTF (required if use_guide_annotation = true):
-annotation: "/home/MinaRyten/Emil/references/gencode.v44.annotation.gtf"
+annotation: "/annotation.gtf"
 
 # Options passed to stringtie2:
 stringtie_opts: ""

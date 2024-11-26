@@ -56,30 +56,46 @@ rule all:
 
 # ----------------------------------------------------------------
 
-# Rule to concatenate reads if config['concatenate_reads'] is True
-# Rule to concatenate reads if config['concatenate_reads'] is True
-if config.get("concatenate_reads", False):
-    rule concatenate_reads:
-        input:
-            fq = in_fastq
+rule concatenate_reads:
+    input:
+        fq = in_fastq
 
-        output:
-            fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq"))
+    output:
+        fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq"))
 
-        params:
-            concat = "True"
+    params:
+        concat = "True"
 
-        threads: config["threads"]
+    threads: config["threads"]
 
-        shell:
-            """
-            if [[ {params.concat} == "True" ]]; then
-                find {input.fq} -regextype posix-extended -regex '.*\\.(fastq|fq)$' -exec cat {{}} \\; > {output.fq_concat}
-                find {input.fq} -regextype posix-extended -regex '.*\\.gz$' -exec zcat {{}} \\; >> {output.fq_concat}
+    shell:
+        """
+        mkdir -p processed_reads temp_concat
+
+        if [ "{params.concat}" = "True" ]; then
+            # Handle gzipped files
+            find $(dirname {input.fq[0]}) -type f -name "*.gz" | \
+                xargs -P {threads} -I{{}} sh -c 'zcat "{{}}" > temp_concat/$(basename "{{}}" .gz)'
+
+            # Concatenate all decompressed temp files
+            cat temp_concat/* > {output.fq_concat}
+
+            # Remove temp files
+            rm -r temp_concat
+
+            # Concatenate non-gz files directly
+            find $(dirname {input.fq[0]}) -type f -not -name "*.gz" -exec cat {{}} + >> {output.fq_concat}
+        else
+            # Handle non-concatenation case
+            if [[ "{input.fq}" == *.gz ]]; then
+                # Decompress gzipped file
+                zcat {input.fq} > {output.fq_concat}
             else
-                ln -s `realpath {input.fq}` {output.fq_concat}
+                # Create a symbolic link
+                ln -s $(realpath {input.fq}) {output.fq_concat}
             fi
-            """
+        fi
+        """
 
 # ----------------------------------------------------------------
 
@@ -103,27 +119,29 @@ if config.get("concatenate_reads", False):
 rule pychopper:
     input:
         fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
-
     output:
-        pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fastq")
-
+        pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fq")
     params:
-        outpath = "Pychopper",
-        prefix = f"{sample}_full_length_reads.fastq",
+        outpath = "Pychopper",  # Use this for output path directly
+        prefix = f"{sample}_full_length_reads.fq",
         pc = "True" if config["run_pychopper"] else "False",
         pc_opts = config["pychopper_opts"],
         kit = config["kit"]
-
     log: path.join(WORKDIR, "Pychopper", f"{sample}_pychopped.log")
-
     threads: config["threads"]
 
     run:
+    
+        shell("mkdir -p {params.outpath}")
+
         if params.pc == "True":
             shell(
                 """
-                cd {params.outpath};
-                pychopper {params.pc_opts} -t {threads} -k {params.kit} -r report.pdf -u unclassified.fq -w rescued.fq {input.fq} {params.prefix} 2> {log}
+                pychopper {params.pc_opts} -t {threads} -k {params.kit} \
+                -r {params.outpath}/report.pdf \
+                -u {params.outpath}/unclassified.fq \
+                -w {params.outpath}/rescued.fq \
+                {input.fq} {output.pyfq} 2> {log}
                 """
             )
         else:
@@ -132,6 +150,7 @@ rule pychopper:
                 ln -s `realpath {input.fq}` {output.pyfq}
                 """
             )
+
 
 # ----------------------------------------------------------------
 
