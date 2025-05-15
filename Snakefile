@@ -12,14 +12,17 @@ min_version("7.18")
 
 configfile: "config.yml"
 validate(config, schema="schema/config_schema.yaml")
-workdir: config["workdir"]
+workdir: path.join(config["workdir"], config["sample_name"])
 
 WORKDIR = config["workdir"]
 SNAKEDIR = path.dirname(workflow.snakefile)
 
-shutil.copy2(SNAKEDIR + "/config.yml", WORKDIR)
-
 sample = config["sample_name"]
+sample_dir = path.join(WORKDIR, sample)
+
+
+shutil.copy2(path.join(SNAKEDIR, "config.yml"), sample_dir)
+
 
 in_fastq = config["reads_fastq"]
 
@@ -47,7 +50,7 @@ if not path.isabs(in_annotation) and in_annotation != "":
 
 target_list = [
     # "Nanostat/stat_out.txt",
-    path.join("StringTie", f"{sample}_stringtie.gff")
+    path.join(sample_dir, "StringTie", f"{sample}_stringtie.gff")
 ]
 
 rule all:
@@ -61,7 +64,7 @@ rule concatenate_reads:
         fq = in_fastq
 
     output:
-        fq_concat = temp(path.join("processed_reads", f"{sample}_reads_concat.fq"))
+        fq_concat = temp(path.join(sample_dir, "processed_reads", f"{sample}_reads_concat.fq"))
 
     params:
         concat = "True"
@@ -120,14 +123,14 @@ rule pychopper:
     input:
         fq = rules.concatenate_reads.output.fq_concat if config.get("concatenate_reads", False) else in_fastq
     output:
-        pyfq = path.join("Pychopper", f"{sample}_full_length_reads.fq")
+        pyfq = path.join(sample_dir, "{}/Pychopper".format(sample_dir), f"{sample}_full_length_reads.fq")
     params:
-        outpath = "Pychopper",  # Use this for output path directly
+        outpath = "{}/Pychopper".format(sample_dir),  # Use this for output path directly
         prefix = f"{sample}_full_length_reads.fq",
         pc = "True" if config["run_pychopper"] else "False",
         pc_opts = config["pychopper_opts"],
         kit = config["kit"]
-    log: path.join(WORKDIR, "Pychopper", f"{sample}_pychopped.log")
+    log: path.join(sample_dir, "{}/Pychopper".format(sample_dir), f"{sample}_pychopped.log")
     threads: config["threads"]
 
     run:
@@ -160,12 +163,12 @@ rule minimap_mapping:
         fq = rules.pychopper.output.pyfq
 
     output:
-        sam = path.join("Mapping", f"{sample}_minimap.sam")
+        sam = path.join(sample_dir, "Mapping", f"{sample}_minimap.sam")
 
     params:
         opts = config["minimap2_opts"]
 
-    log: path.join("Mapping", f"{sample}_minimap.log")
+    log: path.join(sample_dir, "Mapping", f"{sample}_minimap.log")
 
     threads: config["threads"]
 
@@ -182,7 +185,7 @@ rule aln_stats:
         sam=rules.minimap_mapping.output.sam
 
     output:
-        tsv=path.join("Mapping", f"{sample}_alignment_stats.tsv")
+        tsv=path.join(sample_dir, "Mapping", f"{sample}_alignment_stats.tsv")
 
     threads: config["threads"]
 
@@ -203,13 +206,13 @@ rule run_stringtie:
         fa=config["genome"]
 
     output:
-        gff = path.join("StringTie", f"{sample}_stringtie.gff")
+        gff = path.join(sample_dir, "StringTie", f"{sample}_stringtie.gff")
 
     params:
         opts = config["stringtie_opts"],
         ann = in_annotation if config["use_guide_annotation"] else ""
 
-    log: path.join("StringTie", f"{sample}_StringTie.log")
+    log: path.join(sample_dir, "StringTie", f"{sample}_StringTie.log")
     
     threads: config["threads"]
 

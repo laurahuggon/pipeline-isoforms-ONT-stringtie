@@ -2,19 +2,19 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: ""
+workdir: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "sample"
+sample_name: "sample_5292_PAG75292"
 
 # reference genome as fasta (required):
-genome: "/genome.fa"
+genome: "/home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
 
 # ONT reads in fastq format (required):
-reads_fastq: ""
+reads_fastq: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5292_PAG75292.fastq.gz"
 
 # The path above is a directory, find and concatenate fastq files:
-concatenate_reads: True
+concatenate_reads: False
 
 # Process cDNA reads using pychopper, turn off for direct RNA:
 run_pychopper: True
@@ -35,7 +35,7 @@ threads: 200
 use_guide_annotation: False
 
 # reference annotation as GTF (required if use_guide_annotation = true):
-annotation: "/annotation.gtf"
+annotation: ""
 
 # Options passed to stringtie2:
-stringtie_opts: ""
+stringtie_opts: "-f 0.005"

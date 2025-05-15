@@ -1,0 +1,25 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 200
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count    min threads    max threads
+---------------  -------  -------------  -------------
+all                    1              1              1
+minimap_mapping        1            200            200
+pychopper              1            200            200
+run_stringtie          1            200            200
+total                  4              1            200
+
+Select jobs to execute...
+
+[Thu May 15 11:51:37 2025]
+rule pychopper:
+    input: /home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5292_PAG75292.fastq.gz
+    output: /home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/pipeline-isoforms-ONT-stringtie/sample_5292_PAG75292/Pychopper/sample_5292_PAG75292_full_length_reads.fq
+    log: /home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/pipeline-isoforms-ONT-stringtie/sample_5292_PAG75292/Pychopper/sample_5292_PAG75292_pychopped.log
+    jobid: 3
+    reason: Missing output files: /home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/pipeline-isoforms-ONT-stringtie/sample_5292_PAG75292/Pychopper/sample_5292_PAG75292_full_length_reads.fq
+    threads: 200
+    resources: tmpdir=/tmp
+
