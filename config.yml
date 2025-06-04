@@ -5,13 +5,13 @@
 workdir: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "sample_5292_PAG75292"
+sample_name: "sample_1092_PAM41667"
 
 # reference genome as fasta (required):
 genome: "/home/MinaRyten/Emil/references/GRCh38.primary_assembly.genome.fa"
 
 # ONT reads in fastq format (required):
-reads_fastq: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_5292_PAG75292.fastq.gz"
+reads_fastq: "/home/MinaRyten/Emil/public_data/long-read/Ebbert_2023/sample_1092_PAM41667.fastq.gz"
 
 # The path above is a directory, find and concatenate fastq files:
 concatenate_reads: False

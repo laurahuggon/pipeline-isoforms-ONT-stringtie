@@ -49,8 +49,8 @@ if not path.isabs(in_annotation) and in_annotation != "":
 # ----------------------------------------------------------------
 
 target_list = [
-    # "Nanostat/stat_out.txt",
-    path.join(sample_dir, "StringTie", f"{sample}_stringtie.gff")
+    path.join(sample_dir, "StringTie", f"{sample}_stringtie.gff"),
+    path.join(sample_dir, "Mapping", f"{sample}_alignment_stats.tsv"),
 ]
 
 rule all:
