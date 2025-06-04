@@ -1,3 +1,0 @@
-KeyError in line 165 of /home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/snakefile:
-'stringtie_opts'
-  File "/home/MinaRyten/Emil/Snakemakes/pipeline-isoforms-ONT-stringtie/snakefile", line 165, in <module>
