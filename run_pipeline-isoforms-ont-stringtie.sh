@@ -9,12 +9,7 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=k21224575@kcl.ac.uk
 
-# Set sample barcode
-BARCODE="barcode01"
-
-# Copy input (FASTQ) files for this sample to scratch
-cp -n /rds/prj/bcn_synaptopathy_in_ftd_als/Emma_Clayton_data/pool1-16/*/fastq_pass/${BARCODE}/*.fastq.gz /scratch/users/$USER/input_fastq/
-# Print number of FASTQ files in input_fastq directory
+# Check number of files
 ls /scratch/users/$USER/input_fastq/*.fastq.gz | wc -l
 
 # Load anaconda
@@ -30,11 +25,3 @@ cd /users/$USER/pipeline-isoforms-ONT-stringtie
 snakemake --use-conda -n all
 # Run snakemake
 snakemake --use-conda -j 30 all
-
-# Copy output files to RDS
-cp -r /scratch/users/$USER/${BARCODE} /rds/prj/bcn_synaptopathy_in_ftd_als/synaptosome_long-read/data/processed/
-cp /scratch/users/%u/%j.out /rds/prj/bcn_synaptopathy_in_ftd_als/synaptosome_long-read/data/processed/${BARCODE}/
-
-# Remove input (FASTQ) files from scratch
-
-# Remove output files from scratch

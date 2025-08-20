@@ -8,7 +8,7 @@ workdir: "/scratch/users/k21224575/"
 sample_name: "barcode01"
 
 # reference genome as fasta (required):
-genome: "/rds/prj/bcn_synaptopathy_in_ftd_als/synaptosome_long-read/references/GRCh38.primary_assembly.genome.fa"
+genome: "/scratch/users/k21224575/references/GRCh38.primary_assembly.genome.fa"
 
 # ONT reads in fastq format (required):
 reads_fastq: "/scratch/users/k21224575/input_fastq/"
