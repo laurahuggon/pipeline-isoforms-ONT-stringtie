@@ -20,7 +20,7 @@ source /users/${USER}/.bashrc
 source activate ont_stringtie
 
 # Go to repo directory
-cd /users/$USER/pipeline-isoforms-ONT-stringtie
+cd /scratch/users/$USER/pipeline-isoforms-ONT-stringtie
 # Test run (prints the commands it would run but does not execute anything)
 snakemake --use-conda -n all
 # Run snakemake

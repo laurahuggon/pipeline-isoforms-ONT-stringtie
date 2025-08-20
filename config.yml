@@ -2,7 +2,7 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: "/scratch/users/k21224575/"
+workdir: "/scratch/users/k21224575/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
 sample_name: "barcode01"
