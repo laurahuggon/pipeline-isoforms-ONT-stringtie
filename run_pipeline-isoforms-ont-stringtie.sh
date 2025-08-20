@@ -6,6 +6,8 @@
 #SBATCH --cpus-per-task=30
 #SBATCH --mem=128G
 #SBATCH --time=48:00:00
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=k21224575@kcl.ac.uk
 
 # Set sample barcode
 BARCODE="barcode01"
