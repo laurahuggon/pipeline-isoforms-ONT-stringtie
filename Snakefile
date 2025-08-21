@@ -73,15 +73,23 @@ rule concatenate_reads:
 
     shell:
         """
+        pwd
+        
         mkdir -p processed_reads temp_concat
+        
+        ls .
 
         if [ "{params.concat}" = "True" ]; then
             # Handle gzipped files
             find $(dirname {input.fq[0]}) -type f -name "*.gz" | \
                 xargs -P {threads} -I{{}} sh -c 'zcat "{{}}" > temp_concat/$(basename "{{}}" .gz)'
 
+            echo "Starting concatenation..."
+            
             # Concatenate all decompressed temp files
             cat temp_concat/* > {output.fq_concat}
+            
+            echo "Finished concatenation"
 
             # Remove temp files
             rm -r temp_concat
@@ -134,7 +142,7 @@ rule pychopper:
     threads: config["threads"]
 
     run:
-    
+
         shell("mkdir -p {params.outpath}")
 
         if params.pc == "True":
@@ -213,7 +221,7 @@ rule run_stringtie:
         ann = in_annotation if config["use_guide_annotation"] else ""
 
     log: path.join(sample_dir, "StringTie", f"{sample}_StringTie.log")
-    
+
     threads: config["threads"]
 
     run:
