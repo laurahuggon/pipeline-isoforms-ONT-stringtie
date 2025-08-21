@@ -78,11 +78,15 @@ rule concatenate_reads:
         mkdir -p processed_reads temp_concat
         
         ls .
+        
+        echo "Starting unzipping..."
 
         if [ "{params.concat}" = "True" ]; then
             # Handle gzipped files
             find $(dirname {input.fq[0]}) -type f -name "*.gz" | \
                 xargs -P {threads} -I{{}} sh -c 'zcat "{{}}" > temp_concat/$(basename "{{}}" .gz)'
+                
+            ls temp_concat/*.fastq | wc -l
 
             echo "Starting concatenation..."
             
