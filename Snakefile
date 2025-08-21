@@ -64,7 +64,7 @@ rule concatenate_reads:
         fq = in_fastq
 
     output:
-        fq_concat = path.join(sample_dir, "processed_reads", f"{sample}_reads_concat.fq")
+        fq_concat = temp(path.join(sample_dir, "processed_reads", f"{sample}_reads_concat.fq"))
 
     params:
         concat = "True"
