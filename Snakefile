@@ -81,7 +81,8 @@ rule concatenate_reads:
                 xargs -P {threads} -I{{}} sh -c 'zcat "{{}}" > temp_concat/$(basename "{{}}" .gz)'
 
             # Concatenate all decompressed temp files
-            cat temp_concat/* > {output.fq_concat}
+            # cat temp_concat/* > {output.fq_concat}
+            find temp_concat -type f -print0 | xargs -0 cat -- > {output.fq_concat}
 
             # Remove temp files
             rm -r temp_concat
