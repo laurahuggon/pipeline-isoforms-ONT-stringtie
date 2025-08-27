@@ -10,7 +10,7 @@
 #SBATCH --mail-user=k21224575@kcl.ac.uk
 
 # Check number of files
-ls /scratch/prj/bcn_synaptopathy/input_fastq/*.fastq.gz | wc -l
+ls /scratch/prj/bcn_synaptopathy/input_fastq/*barcode01*.fastq.gz | wc -l
 
 # Load anaconda
 module load anaconda3/2022.10-gcc-13.2.0
