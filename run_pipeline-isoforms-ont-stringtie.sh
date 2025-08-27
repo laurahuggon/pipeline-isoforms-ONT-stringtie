@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=ont_barcode01_no-annotation
-#SBATCH --output=/scratch/users/%u/%j.out
+#SBATCH --output=/scratch/prj/bcn_synaptopathy/%j.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30
@@ -10,7 +10,7 @@
 #SBATCH --mail-user=k21224575@kcl.ac.uk
 
 # Check number of files
-ls /scratch/users/$USER/input_fastq/*.fastq.gz | wc -l
+ls /scratch/prj/bcn_synaptopathy/input_fastq/*.fastq.gz | wc -l
 
 # Load anaconda
 module load anaconda3/2022.10-gcc-13.2.0
@@ -20,8 +20,6 @@ source /users/${USER}/.bashrc
 source activate ont_stringtie
 
 # Go to repo directory
-cd /scratch/users/$USER/pipeline-isoforms-ONT-stringtie
-# Test run (prints the commands it would run but does not execute anything)
-snakemake --use-conda -n all
+cd /scratch/prj/bcn_synaptopathy/pipeline-isoforms-ONT-stringtie
 # Run snakemake
 snakemake --use-conda -j 30 all
