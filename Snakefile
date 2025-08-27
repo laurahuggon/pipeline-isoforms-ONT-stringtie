@@ -99,6 +99,7 @@ rule concatenate_reads:
             rm -r temp_concat
             
             ls .
+            sleep 5m
 
             # Concatenate non-gz files directly
             find $(dirname {input.fq[0]}) -type f -not -name "*.gz" -exec cat {{}} + >> {output.fq_concat}
