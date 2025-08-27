@@ -2,16 +2,16 @@
 ## For optional parameters either leave empty string ("") or comment out ("#") the parameter
 
 # working directory (required):
-workdir: "/scratch/users/k21224575/pipeline-isoforms-ONT-stringtie/"
+workdir: "/scratch/prj/bcn_synaptopathy/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
 sample_name: "barcode01"
 
 # reference genome as fasta (required):
-genome: "/scratch/users/k21224575/references/GRCh38.primary_assembly.genome.fa"
+genome: "/scratch/prj/bcn_synaptopathy/references/GRCh38.primary_assembly.genome.fa"
 
 # ONT reads in fastq format (required):
-reads_fastq: "/scratch/users/k21224575/input_fastq/"
+reads_fastq: "/scratch/prj/bcn_synaptopathy/input_fastq/"
 
 # The path above is a directory, find and concatenate fastq files:
 concatenate_reads: True
