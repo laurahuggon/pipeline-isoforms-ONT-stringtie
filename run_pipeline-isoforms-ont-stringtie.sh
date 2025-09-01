@@ -1,16 +1,17 @@
 #!/bin/bash -l
-#SBATCH --job-name=ont_barcode01_no-annotation
+#SBATCH --job-name=ont_barcode02_no-annotation
 #SBATCH --output=/scratch/prj/bcn_synaptopathy/%j.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30
-#SBATCH --mem=128G
-#SBATCH --time=48:00:00
+#SBATCH --mem=200G
+#SBATCH --time=12:00:00
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=k21224575@kcl.ac.uk
 
 # Check number of files
-ls /scratch/prj/bcn_synaptopathy/input_fastq/*barcode01*.fastq.gz | wc -l
+ls /scratch/prj/bcn_synaptopathy/input_fastq/*.fastq.gz | wc -l
+ls /scratch/prj/bcn_synaptopathy/input_fastq/*barcode02*.fastq.gz | wc -l
 
 # Load anaconda
 module load anaconda3/2022.10-gcc-13.2.0
