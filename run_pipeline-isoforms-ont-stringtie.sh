@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name=ont_barcode11_no-annotation
+#SBATCH --job-name=ont_barcode12_no-annotation
 #SBATCH --output=/scratch/prj/bcn_synaptopathy/%j.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -11,7 +11,7 @@
 
 # Check number of files
 ls /scratch/prj/bcn_synaptopathy/input_fastq/*.fastq.gz | wc -l
-ls /scratch/prj/bcn_synaptopathy/input_fastq/*barcode11*.fastq.gz | wc -l
+ls /scratch/prj/bcn_synaptopathy/input_fastq/*barcode12*.fastq.gz | wc -l
 
 # Load anaconda
 module load anaconda3/2022.10-gcc-13.2.0
