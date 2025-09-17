@@ -5,7 +5,7 @@
 workdir: "/scratch/prj/bcn_synaptopathy/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "barcode14"
+sample_name: "barcode15"
 
 # reference genome as fasta (required):
 genome: "/scratch/prj/bcn_synaptopathy/references/GRCh38.primary_assembly.genome.fa"
