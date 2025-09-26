@@ -5,7 +5,7 @@
 workdir: "/scratch/prj/bcn_synaptopathy/pipeline-isoforms-ONT-stringtie/"
 
 # prefix of all output files (optional; default = "sample")
-sample_name: "barcode16"
+sample_name: "barcode01"
 
 # reference genome as fasta (required):
 genome: "/scratch/prj/bcn_synaptopathy/references/GRCh38.primary_assembly.genome.fa"
@@ -32,10 +32,10 @@ minimap2_opts: "-uf -k14 --MD"
 threads: 30
 
 # Use exiting annotation as guide for stringtie2:
-use_guide_annotation: False
+use_guide_annotation: True
 
 # reference annotation as GTF (required if use_guide_annotation = true):
-annotation: ""
+annotation: "/scratch/prj/bcn_synaptopathy/references/gencode.v49.annotation.gtf"
 
 # Options passed to stringtie2:
 stringtie_opts: "-f 0.005"
